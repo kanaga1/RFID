@@ -4,8 +4,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:layout_weight="1"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -21,12 +20,12 @@
             android:background="#fd9f3e"
             android:drawableTop="@drawable/btn_rr"
             android:onClick="rrClicked"
-            android:paddingTop="@dimen/default_top_padding"
+            android:paddingTop="30dp"
             android:layout_marginTop="@dimen/home_icon_margin_2"
             android:layout_marginStart="@dimen/home_icon_margin_2"
             android:layout_marginEnd="@dimen/home_icon_margin_1"
             android:layout_marginBottom="@dimen/home_icon_margin_1"
-            android:text="@string/rapid_read"
+            android:text="Consolidate Data"
             android:textSize="25sp"
             android:layout_marginLeft="@dimen/home_icon_margin_2"
             android:layout_marginRight="@dimen/home_icon_margin_1" />
@@ -41,7 +40,7 @@
             android:drawableTop="@drawable/btn_inv"
             android:gravity="center_horizontal|top"
             android:onClick="invClicked"
-            android:paddingTop="10dp"
+            android:paddingTop="30dp"
             android:layout_marginTop="@dimen/home_icon_margin_2"
             android:layout_marginStart="@dimen/home_icon_margin_1"
             android:layout_marginEnd="@dimen/home_icon_margin_2"
@@ -66,12 +65,12 @@
             android:background="#fd9f3e"
             android:drawableTop="@drawable/btn_locate"
             android:onClick="locateClicked"
-            android:paddingTop="10dp"
+            android:paddingTop="30dp"
             android:layout_marginTop="@dimen/home_icon_margin_1"
             android:layout_marginStart="@dimen/home_icon_margin_2"
             android:layout_marginEnd="@dimen/home_icon_margin_1"
             android:layout_marginBottom="@dimen/home_icon_margin_1"
-            android:text="Locate Tag"
+            android:text="Search Item"
             android:textSize="25sp"
             android:layout_marginLeft="@dimen/home_icon_margin_2"
             android:layout_marginRight="@dimen/home_icon_margin_1" />
@@ -85,7 +84,7 @@
             android:background="#fd9f3e"
             android:drawableTop="@drawable/register"
             android:onClick="RegisterClicked"
-            android:paddingTop="10dp"
+            android:paddingTop="30dp"
             android:layout_marginTop="@dimen/home_icon_margin_1"
             android:layout_marginStart="@dimen/home_icon_margin_1"
             android:layout_marginEnd="@dimen/home_icon_margin_2"
@@ -110,12 +109,12 @@
             android:background="#fd9f3e"
             android:drawableTop="@drawable/deadline"
             android:onClick="expiryClicked"
-            android:paddingTop="10dp"
+            android:paddingTop="30dp"
             android:layout_marginTop="@dimen/home_icon_margin_1"
             android:layout_marginStart="@dimen/home_icon_margin_2"
             android:layout_marginEnd="@dimen/home_icon_margin_1"
             android:layout_marginBottom="@dimen/home_icon_margin_1"
-            android:text="Expired Data"
+            android:text="Barcode Scan"
             android:textSize="25sp"
             android:layout_marginLeft="@dimen/home_icon_margin_2"
             android:layout_marginRight="@dimen/home_icon_margin_1" />
@@ -129,7 +128,7 @@
             android:background="#fd9f3e"
             android:drawableTop="@drawable/dl_rdl"
             android:onClick="settClicked"
-            android:paddingTop="10dp"
+            android:paddingTop="30dp"
             android:layout_marginTop="@dimen/home_icon_margin_1"
             android:layout_marginStart="@dimen/home_icon_margin_1"
             android:layout_marginEnd="@dimen/home_icon_margin_2"
@@ -139,7 +138,5 @@
             android:layout_marginLeft="@dimen/home_icon_margin_1"
             android:layout_marginRight="@dimen/home_icon_margin_2" />
     </LinearLayout>
-
-
 
 </LinearLayout>

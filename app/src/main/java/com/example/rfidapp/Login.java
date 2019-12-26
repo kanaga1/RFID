@@ -25,7 +25,7 @@ public class Login extends AppCompatActivity {
     private Retrofit retrofit;
     public String name = "", pass2 = "", email1 = "", pass = "", email = "";
     private RetrofitInterface retrofitInterface;
-    private String BASE_URL = "http://192.168.0.103:3000";
+    private String BASE_URL = "https://rfidpoc.herokuapp.com/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -16,10 +16,14 @@
         <item name="android:height">150dp</item>
         <item name="height">60dp</item>
     </style>
+    <style name="ColoredButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:textColor">@color/colorPrimaryDark1</item>
+    </style>
     <style name="SearchViewStyle" parent="Widget.AppCompat.SearchView">
         <!-- Gets rid of the search icon -->
         <!-- Gets rid of the "underline" in the text -->
         <item name="queryBackground">@null</item>
+        <item name="android:textSize">50px</item>
         <!-- Gets rid of the search icon when the SearchView is expanded -->
         <item name="searchHintIcon">@null</item>
         <!-- The hint text that appears when the user has not typed anything -->

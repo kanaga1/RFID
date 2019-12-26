@@ -82,10 +82,12 @@ public class MainActivity extends AppCompatActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         if (!isBluetoothEnabled()) {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivity(enableIntent);
         }
+
         actionBar= getSupportActionBar();
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#002663")));
 
@@ -167,11 +169,10 @@ public class MainActivity extends AppCompatActivity  {
 
     }
     public static boolean isBluetoothEnabled() {
-        System.out.println("222222222222222222222222");
         return BluetoothAdapter.getDefaultAdapter().isEnabled();
     }
     private boolean shouldShowDisconnected() {
-        System.out.println("333333333333333333333333");
+
         return mIsActiveDisconnect || mReConnectCount == 0;
     }
 
@@ -181,7 +182,6 @@ public class MainActivity extends AppCompatActivity  {
         public void getStatus(final RFIDWithUHFBluetooth.StatusEnum statusEnum, final BluetoothDevice device) {
             runOnUiThread(new Runnable() {
                 public void run() {
-                    System.out.println("1111111111111111111111111111111111111111");
                     remoteBTName = "";
                     remoteBTAdd = "";
                     if (statusEnum == RFIDWithUHFBluetooth.StatusEnum.CONNECTED) {
@@ -222,19 +222,16 @@ public class MainActivity extends AppCompatActivity  {
         }
     }
     public void connect(String deviceAddress) {
-        System.out.println("dddddddddddddd"  +  uhf.getConnectStatus() .equals(RFIDWithUHFBluetooth.StatusEnum.CONNECTING) );
         if (uhf.getConnectStatus() == RFIDWithUHFBluetooth.StatusEnum.CONNECTING) {
 
             Toast.makeText(this, getString(R.string.connecting), Toast.LENGTH_SHORT).show();
         } else {
-            System.out.println("lllllllllllllllllllllllllpppppppppppppppppppp"+btStatus+deviceAddress);
             uhf.connect(deviceAddress, btStatus);
 
         }
     }
     IConnectStatus iConnectStatus = null;
     private void reConnect(String deviceAddress) {
-        System.out.println("55555555555555555555555555555");
 
         if (!mIsActiveDisconnect && mReConnectCount > 0) {
             connect(deviceAddress);
@@ -242,7 +239,6 @@ public class MainActivity extends AppCompatActivity  {
         }
     }
     public void setConnectStatusNotice(IConnectStatus iConnectStatus) {
-        System.out.println("6666666666666666666666666666666");
         this.iConnectStatus = iConnectStatus;
     }
 
@@ -321,7 +317,7 @@ public class MainActivity extends AppCompatActivity  {
                 fragment = RegisterFragment.newInstance();
                 break;
             case 5:
-                fragment = expiry.newInstance();
+                fragment = BarcodeFragment.newInstance();
                 break;
             case 6:
                 fragment = ReadersListFragment.newInstance();

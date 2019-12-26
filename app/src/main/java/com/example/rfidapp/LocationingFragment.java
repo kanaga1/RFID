@@ -1,6 +1,11 @@
 package com.example.rfidapp;
 
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Color;
+import android.media.AudioManager;
+import android.media.SoundPool;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,20 +44,26 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
+import static android.content.Context.AUDIO_SERVICE;
+
 public class LocationingFragment extends Fragment {
     private AutoCompleteTextView et_locateTag;
     private RangeGraph locationBar;
-
+    private static HashMap<Integer, Integer> soundMap = new HashMap<Integer, Integer>();
+    private static SoundPool soundPool;
+    private static float volumnRatio;
+    private static AudioManager am;
     public static short TagProximityPercent = -1;
     public String myInt;
-
-    public String item,tag,Uniquetag;
+    ConnectivityReceiver myReceiver;
+    public String item,tag,Uniquetag,mergetest;
     Button btn_locate,btn_stop;
+    List<String> responseList = new ArrayList<String>();
     List<User> heroList;
     private String TAG = "DeviceAPI_UHFReadTag";
     Toast mToast;
 
-    private String BASE_URL = "http://192.168.0.101:3000";
+    private String BASE_URL = "https://rfidpoc.herokuapp.com/";
     private boolean loopFlag = false;
 
     // private Button btInventory; "single"
@@ -76,6 +87,7 @@ public class LocationingFragment extends Fragment {
     boolean isRuning = false;
     private long mStrTime;
 
+
     Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -85,10 +97,10 @@ public class LocationingFragment extends Fragment {
                     if (msg.arg1 == FLAG_SUCCESS) {
                         //停止成功
 //                        btClear.setEnabled(true);
-                        btn_locate.setEnabled(false);
+
                     } else {
                         //停止失败
-                        //Utils.playSound(2);
+                        Utils.playSound(2);
                         Toast.makeText(mContext, "Inventory Fail", Toast.LENGTH_SHORT).show();
                     }
                     break;
@@ -100,41 +112,88 @@ public class LocationingFragment extends Fragment {
 
                     } else {
                         //开始读取标签失败
-                        //Utils.playSound(2);
+                        Utils.playSound(2);
                     }
                     break;
                 case FLAG_UHFINFO:
                     UHFTAGInfo info = (UHFTAGInfo) msg.obj;
+                    locationBar.setValue((short)0);
+                    locationBar.invalidate();
+                    locationBar.requestLayout();
                     addEPCToList(info, "N/A");
-                    // Utils.playSound(1);
+
                     break;
             }
         }
     };
     private void addEPCToList(UHFTAGInfo uhftagInfo, String rssi) {
         if (!TextUtils.isEmpty(uhftagInfo.getEPC())) {
+            String[] str;
 
                     // mContext.getAppContext().uhfQueue.offer(epc + "\t 1");
 
 
-            System.out.println("jujujujuuuuuuuuuuu"+Uniquetag+uhftagInfo.getEPC()+Uniquetag.equals(uhftagInfo.getEPC()));
+            System.out.println("jujujujuuuuuuuuuuu"+uhftagInfo.getRssi()+"///////////"+RFIDWithUHFBluetooth.getInstance());
+            if(mergetest!=null)
+            {
+                str = et_locateTag.getText().toString().split("\\s+");
+                System.out.println("ooooooooo"+str[0]);
+                for(int i=0;i<heroList.size();i++)
+                {
 
+                    if(str[0].equals(heroList.get(i).getP_ID()))
+                    {
+
+                        Uniquetag=heroList.get(i).getEPCID();
+                    }
+                    else
+                    {
+                        Toast.makeText(getContext(),"No data found",Toast.LENGTH_SHORT);
+                    }
+                }
+            }
+            System.out.println("llllllllllllll"+Uniquetag+"lolololll"+uhftagInfo.getEPC());
             if(Uniquetag.equals(uhftagInfo.getEPC()))
                         {
-                        System.out.println("pppppppppppppppppppp"+Uniquetag+uhftagInfo.getEPC());
-                            locationBar.setValue(80);
-                            locationBar.invalidate();
-                            locationBar.requestLayout();
+                            System.out.println("ghghghghgh"+Uniquetag+"");
+                            float audioMaxVolumn = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC); // 返回当前AudioManager对象的最大音量值
+                            float audioCurrentVolumn = am.getStreamVolume(AudioManager.STREAM_MUSIC);// 返回当前AudioManager对象的音量值
+                            volumnRatio = audioCurrentVolumn / audioMaxVolumn;
+                            try {
+
+                                soundPool.play(soundMap.get(1), volumnRatio, // 左声道音量
+                                        volumnRatio, // 右声道音量
+                                        1, // 优先级，0为最低
+                                        0, // 循环次数，0无不循环，-1无永远循环
+                                        1 // 回放速度 ，该值在0.5-2.0之间，1为正常速度
+                                );
+                                locationBar.setValue((short) 80);
+                                locationBar.invalidate();
+                                locationBar.requestLayout();
+                                new android.os.Handler().postDelayed(
+                                        new Runnable() {
+                                            public void run() {
+                                                locationBar.setValue((short) 0);
+                                                locationBar.invalidate();
+                                                locationBar.requestLayout();
+                                            }
+                                        },
+                                        500);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+
+//                            TagProximityPercent = uhftagInfo.getEPC().LocationInfo.getRelativeDistance();
 //                        System.out.println("dddd"+ heroList.get(i).getP_name()+"uuu"+heroList.get(i).getP_type()+"hhh");
                         }
+
             else
             {
-                locationBar.setValue(0);
+                locationBar.setValue((short) 0);
                 locationBar.invalidate();
                 locationBar.requestLayout();
             }
-
-
 
 
             float useTime = (System.currentTimeMillis() - mStrTime) / 1000.0F;
@@ -183,7 +242,11 @@ public class LocationingFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+//        Utils.initSound(getContext());
+        soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 5);
+        soundMap.put(1, soundPool.load(getContext(), R.raw.barcodebeep, 1));
+//        soundMap.put(2, soundPool.load(getContext(), R.raw.serror, 1));
+        am = (AudioManager) getContext().getSystemService(AUDIO_SERVICE);// 实例化AudioManager对象
     }
 
     @Override
@@ -191,26 +254,65 @@ public class LocationingFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-
         return inflater.inflate(R.layout.fragment_locationing, container, false);
 
-
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        init();
+        if (mContext.uhf.getConnectStatus() == RFIDWithUHFBluetooth.StatusEnum.CONNECTED)
+            {
+                btn_locate.setEnabled(true);
+
+            }else
+            {
+                btn_locate.setEnabled(false);
+            }
+        }
+
 
     private void init() {
         System.out.println("777777777777777777777777");
         RetrofitInterface apiService = ApiClient.getClient().create(RetrofitInterface.class);
         Call<List<User>> call = apiService.getUsers();
-        mContext.uhf.setPower(15);
+        mContext.uhf.setPower(30);
         System.out.println("dddddddddddddddddddddddd"+mContext.uhf.getPower());
         call.enqueue(new Callback<List<User>>() {
             @Override
             public void onResponse(Call<List<User>> call, Response<List<User>> response) {
                 heroList = response.body();
+
+
                 if(heroList.size()>1)
                 {
                     for(int i=0;i<heroList.size();i++)
                     {
+
+
+                        Uniquetag=heroList.get(i).getP_ID();
+                        mergetest=heroList.get(i).getP_ID()+" , "+heroList.get(i).getP_name()+" , "+heroList.get(i).getP_type()+heroList.get(i).getUnit();
+                        responseList.add(mergetest);
+
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
+                                android.R.layout.simple_spinner_dropdown_item, responseList);
+
+                        et_locateTag.setAdapter(adapter);
+
+////                        ArrayAdapter<String> adapter1 = new ArrayAdapter<String>
+////                                (getContext(), android.R.layout.select_dialog_item,);
+////                        //Getting the instance of AutoCompleteTextView
+////                        AutoCompleteTextView actv = (AutoCompleteTextView) findViewById(R.id.et_);
+////                        actv.setThreshold(1);//will start working from first character
+//                        et_locateTag.setAdapter(Uniquetag);//setting the adapter data into the AutoCompleteTextView
+//                        et_locateTag.setTextColor(Color.RED);
+
+
+
+
+
+
                         if(tag.equals(heroList.get(i).getP_ID()))
                         {
                             System.out.println("uuuuuuuuuuuuuugggggggggggggggggggg"+Uniquetag);
@@ -279,6 +381,8 @@ public class LocationingFragment extends Fragment {
                 //getUHFInfoEx();
             }
             mContext.scaning = false;
+
+
             handler.sendMessage(msg);
         }
     }
@@ -295,9 +399,11 @@ public class LocationingFragment extends Fragment {
                 stopInventory();
                 isRuning = false;//执行完成设置成false
             } else {
+
                 Message msg = handler.obtainMessage(FLAG_START);
                 System.out.println("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"+msg);
                 if (mContext.uhf.startInventoryTag()) {
+
                     loopFlag = true;
                     mContext.scaning = true;
                     mStrTime = System.currentTimeMillis();
@@ -314,7 +420,9 @@ public class LocationingFragment extends Fragment {
         }
     }
     private boolean getUHFInfo() {
+
         ArrayList<UHFTAGInfo> list = mContext.uhf.readTagFromBuffer();
+
         if (list != null) {
             for (int k = 0; k < list.size(); k++) {
                 UHFTAGInfo info = list.get(k);
@@ -344,12 +452,17 @@ public class LocationingFragment extends Fragment {
          btn_locate = (Button) getActivity().findViewById(R.id.btn_locate);
 
            tag = SharedPreference.getTag_ID(getContext());
+
             System.out.println("eeeeeee"+tag);
 //        locationBar = (RangeGraph) getActivity().findViewById(R.id.locationBar);
         // distance=(TextView)getActivity().findViewById(R.id.distance);
         et_locateTag = (AutoCompleteTextView) getActivity().findViewById(R.id.lt_et_epc);
+        myReceiver =new ConnectivityReceiver();
 
-        init();
+        IntentFilter intentFilter =new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        myReceiver = new ConnectivityReceiver();
+        mContext.registerReceiver(myReceiver,intentFilter);
+
 
         et_locateTag.setText(tag);
 
@@ -367,7 +480,12 @@ public class LocationingFragment extends Fragment {
                     {
                         System.out.println("oooooooooookkkkkkkkkkkkkkkkkkkkkkk");
 
+                        stopInventory();
                         btn_locate.setText("SEARCH");
+                        if(!btn_locate.isEnabled())
+                        {
+                            btn_locate.setEnabled(true);
+                        }
                         locationBar.setValue(0);
                         locationBar.invalidate();
                         locationBar.requestLayout();

@@ -13,6 +13,8 @@ import com.rscja.utility.StringUtility;
 
 import java.util.HashMap;
 
+
+
 import static android.content.Context.AUDIO_SERVICE;
 
 /**
@@ -26,13 +28,17 @@ public class Utils {
     private static SoundPool soundPool;
     private static float volumnRatio;
     private static AudioManager am;
+
     public static void initSound(Context context){
+
         soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 5);
         soundMap.put(1, soundPool.load(context, R.raw.barcodebeep, 1));
         soundMap.put(2, soundPool.load(context, R.raw.serror, 1));
         am = (AudioManager) context.getSystemService(AUDIO_SERVICE);// 实例化AudioManager对象
+
     }
     public static void freeSound(){
+        System.out.println("lllllllllllllllllllllll"+soundPool);
         if(soundPool!=null)
             soundPool.release();
         soundPool=null;
@@ -48,6 +54,7 @@ public class Utils {
         float audioCurrentVolumn = am.getStreamVolume(AudioManager.STREAM_MUSIC);// 返回当前AudioManager对象的音量值
         volumnRatio = audioCurrentVolumn / audioMaxVolumn;
         try {
+
             soundPool.play(soundMap.get(id), volumnRatio, // 左声道音量
                     volumnRatio, // 右声道音量
                     1, // 优先级，0为最低
@@ -58,6 +65,7 @@ public class Utils {
             e.printStackTrace();
         }
     }
+
     public static void alert(Activity act, int titleInt, String message, int iconInt) {
         try {
             AlertDialog.Builder builder = new AlertDialog.Builder(act);
@@ -99,4 +107,5 @@ public class Utils {
                 || model.contains("A8")
                 || model.equals("CWJ600");
     }
+
 }

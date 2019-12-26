@@ -1,5 +1,7 @@
 package com.example.rfidapp;
 
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -20,6 +22,7 @@ import com.example.rfidapp.FileUtils;
 import com.example.rfidapp.MainActivity;
 import com.example.rfidapp.NumberTool;
 import com.example.rfidapp.R;
+import com.example.rfidapp.Retrofit.RetrofitInterface;
 import com.example.rfidapp.Utils;
 import com.rscja.deviceapi.RFIDWithUHFBluetooth;
 import com.rscja.deviceapi.entity.UHFTAGInfo;
@@ -27,14 +30,20 @@ import com.rscja.deviceapi.entity.UHFTAGInfo;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import androidx.fragment.app.Fragment;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class RapidReadFragment  extends Fragment implements View.OnClickListener {
     private boolean loopFlag = false;
-
+    public int count=0;
+    ConnectivityReceiver myReceiver;
     // private Button btInventory; "single"
     private Button InventoryLoop,  btStop;//
     private Button btInventoryPerMinute;
@@ -44,7 +53,7 @@ public class RapidReadFragment  extends Fragment implements View.OnClickListener
     private long total = 0;
     private MainActivity mContext;
     private SimpleAdapter adapter;
-    private HashMap<String, String> map;
+    private HashMap<String, String> map,map1;
     private ArrayList<HashMap<String, String>> tagList;
     private String TAG = "DeviceAPI_UHFReadTag";
 
@@ -57,7 +66,7 @@ public class RapidReadFragment  extends Fragment implements View.OnClickListener
 
     boolean isRuning = false;
     private long mStrTime;
-
+    List<User> heroList;
     Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -68,12 +77,15 @@ public class RapidReadFragment  extends Fragment implements View.OnClickListener
                         //停止成功
 //                        btClear.setEnabled(true);
                         btStop.setEnabled(false);
+                        btStop.setAlpha(0.3f);
                         InventoryLoop.setEnabled(true);
+                        InventoryLoop.setAlpha(1f);
+
                         // btInventory.setEnabled(true); "single"
                         btInventoryPerMinute.setEnabled(true);
                     } else {
                         //停止失败
-                        //Utils.playSound(2);
+                        Utils.playSound(2);
                         Toast.makeText(mContext, "Inventory Fail", Toast.LENGTH_SHORT).show();
                     }
                     break;
@@ -82,18 +94,21 @@ public class RapidReadFragment  extends Fragment implements View.OnClickListener
                         //开始读取标签成功
 //                        btClear.setEnabled(false);
                         btStop.setEnabled(true);
+                        btStop.setAlpha(1f);
                         InventoryLoop.setEnabled(false);
+                        InventoryLoop.setAlpha(0.3f);
+
                         //  btInventory.setEnabled(false); "single"
                         btInventoryPerMinute.setEnabled(false);
                     } else {
                         //开始读取标签失败
-                        //Utils.playSound(2);
+                        Utils.playSound(2);
                     }
                     break;
                 case FLAG_UHFINFO:
                     UHFTAGInfo info = (UHFTAGInfo) msg.obj;
                     addEPCToList(info, "N/A");
-                    // Utils.playSound(1);
+
                     break;
             }
         }
@@ -113,16 +128,26 @@ public class RapidReadFragment  extends Fragment implements View.OnClickListener
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         System.out.println("2222222222222222222222222222");
-
+        Utils.initSound(getContext());
         Log.i(TAG, "UHFReadTagFragment.onActivityCreated");
         super.onActivityCreated(savedInstanceState);
         mContext = (MainActivity) getActivity();
-        init();
+
+        mContext.uhf.setPower(30);
+        myReceiver =new ConnectivityReceiver();
+
+        IntentFilter intentFilter =new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        myReceiver = new ConnectivityReceiver();
+        mContext.registerReceiver(myReceiver,intentFilter);
+        System.out.println("dddddddddddddddddddddddd"+mContext.uhf.getPower());
+
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_rr, container, false);
     }
@@ -166,7 +191,30 @@ public class RapidReadFragment  extends Fragment implements View.OnClickListener
     }
     private void init() {
         System.out.println("777777777777777777777777");
+        RetrofitInterface apiService = ApiClient.getClient().create(RetrofitInterface.class);
+        Call<List<User>> call = apiService.getUsers();
+        call.enqueue(new Callback<List<User>>() {
+            @Override
+            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+                heroList = response.body();
 
+
+//                //Creating an String array for the ListView
+//                String[] heroes = new String[heroList.size()];
+//
+//                //looping through all the heroes and inserting the names inside the string array
+//                for (int i = 0; i < heroList.size(); i++) {
+//                    heroes[i] = heroList.get(i).getName();
+//                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<List<User>> call, Throwable t) {
+                Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
         isExit = false;
         setConnectStatusNotice();
 
@@ -174,6 +222,7 @@ public class RapidReadFragment  extends Fragment implements View.OnClickListener
         InventoryLoop = (Button) mContext.findViewById(R.id.InventoryLoop);
         btStop = (Button) mContext.findViewById(R.id.btStop);
         btStop.setEnabled(false);
+
 //        btClear = (Button) mContext.findViewById(R.id.btClear);
         tv_count = (TextView) mContext.findViewById(R.id.tv_count);
 
@@ -209,14 +258,19 @@ public class RapidReadFragment  extends Fragment implements View.OnClickListener
         System.out.println("55555555555555555555555555555");
 
         super.onResume();
+        init();
         clearData();
         if (mContext.uhf.getConnectStatus() == RFIDWithUHFBluetooth.StatusEnum.CONNECTED) {
 
             InventoryLoop.setEnabled(true);
+            InventoryLoop.setAlpha(1f);
+            btStop.setAlpha(0.3f);
             //    btInventory.setEnabled(true); "single"
             btInventoryPerMinute.setEnabled(true);
         } else {
             InventoryLoop.setEnabled(false);
+            InventoryLoop.setAlpha(0.3f);
+            btStop.setAlpha(0.3f);
             //  btInventory.setEnabled(false); "single"
             btInventoryPerMinute.setEnabled(false);
         }
@@ -382,13 +436,36 @@ public class RapidReadFragment  extends Fragment implements View.OnClickListener
             map.put("tagRssi", rssi);
             // mContext.getAppContext().uhfQueue.offer(epc + "\t 1");
             if (index == -1) {
-                tagList.add(map);
+                if(heroList.size()<1)
+                {
+                    Toast.makeText(getContext(),"No items are available",Toast.LENGTH_SHORT);
+                }
+                else
+                {
+                    for(int i=0;i<heroList.size();i++)
+                    {
+                        System.out.println(";;;;;;;;;;;;;;"+index+"[[[["+heroList.size()+"ll"+heroList.get(i).getEPCID()+"pp"+uhftagInfo.getEPC());
 
-                tv_count.setText("" + adapter.getCount());
+                        if(heroList.get(i).getEPCID().equals(uhftagInfo.getEPC()))
+                        {
+                            Utils.playSound(1);
+                            map1 = new HashMap<String, String>();
+                            map1.put("tagUii", uhftagInfo.getEPC());
+                            map1.put("tagData", heroList.get(i).getP_ID());
+                            map1.put("tagCount", heroList.get(i).getP_name());
+                            map1.put("tagRssi", heroList.get(i).getP_type()+heroList.get(i).getUnit());
+                            tagList.add(map1);
+                            tv_count.setText("" + adapter.getCount());
+
+
+                        }
+                    }
+                }
             } else {
-                int tagcount = Integer.parseInt(tagList.get(index).get("tagCount"), 10) + 1;
-                map.put("tagCount", String.valueOf(tagcount));
-                tagList.set(index, map);
+//                int tagcount = Integer.parseInt(tagList.get(index).get("tagCount"), 10) + 1;
+//                System.out.println("ffffffffffff"+ tagcount);
+//                map.put("tagCount", String.valueOf(tagcount));
+//                tagList.set(index, map);
             }
 
             float useTime = (System.currentTimeMillis() - mStrTime) / 1000.0F;
@@ -432,7 +509,10 @@ public class RapidReadFragment  extends Fragment implements View.OnClickListener
         btInventoryPerMinute.setEnabled(false);
 //        btInventory.setEnabled(false);  "single"
         InventoryLoop.setEnabled(false);
+        InventoryLoop.setAlpha(0.3f);
+
         btStop.setEnabled(true);
+        btStop.setAlpha(1f);
         mContext.scaning = true;
         fileName = path + "battery_" + DateUtils.getCurrFormatDate(DateUtils.DATEFORMAT_FULL) + ".txt";
         mInventoryPerMinuteTask = new TimerTask() {
@@ -488,5 +568,10 @@ public class RapidReadFragment  extends Fragment implements View.OnClickListener
                 }
             }
         }
+    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Utils.freeSound();
     }
 }

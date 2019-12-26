@@ -55,6 +55,9 @@ public class DeviceListActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_device_list);
+
+
+
         System.out.println("hhhhhhhhhhhhhhhhhhhh");
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
@@ -105,6 +108,7 @@ public class DeviceListActivity extends BaseActivity {
                         public void run() {
                             Log.d(TAG, "Successful scan");
                             addDevice(bluetoothDevice, rssi);
+                            System.out.println("8555555555888888888"+rssi);
                         }
                     });
                 }
@@ -144,6 +148,7 @@ public class DeviceListActivity extends BaseActivity {
             }
         }
         devRssiValues.put(device.getAddress(), rssi);
+        System.out.println("ikikkkkkkkkkkkkkk"+rssi);
         if (!deviceFound) {
             deviceList.add(device);
             mEmptyList.setVisibility(View.GONE);

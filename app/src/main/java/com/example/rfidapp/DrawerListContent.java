@@ -15,11 +15,11 @@ public class DrawerListContent {
     static {
         // Add items.
         //addItem(new DrawerItem("1", "Home", R.drawable.app_icon));
-        addItem(new DrawerItem("1", "Rapid Read", R.drawable.btn_rr));
+        addItem(new DrawerItem("1", "Consolidate Data", R.drawable.btn_rr));
         addItem(new DrawerItem("2", "Inventory Item", R.drawable.btn_inv));
-        addItem(new DrawerItem("3", "Locate Tag", R.drawable.btn_locate));
+        addItem(new DrawerItem("3", "Search Item", R.drawable.btn_locate));
         addItem(new DrawerItem("4", "Tag Register", R.drawable.register));
-        addItem(new DrawerItem("5", "Expiry Date", R.drawable.deadline));
+        addItem(new DrawerItem("5", "Barcode Scan", R.drawable.deadline));
         addItem(new DrawerItem("6", "Readers List", R.drawable.dl_rdl));
 //        addItem(new DrawerItem("7", "Beeper", R.drawable.volume));
 //        addItem(new DrawerItem("8", "About", R.drawable.dl_about));

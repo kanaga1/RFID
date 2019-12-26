@@ -1,6 +1,8 @@
 package com.example.rfidapp;
 
+import android.content.IntentFilter;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 
@@ -54,6 +56,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     private long total = 0;
     private MainActivity mContext;
     private SimpleAdapter adapter;
+    ConnectivityReceiver myReceiver;
     private HashMap<String, String> map;
     private ArrayList<HashMap<String, String>> tagList;
     private String TAG = "DeviceAPI_UHFReadTag";
@@ -63,7 +66,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     boolean isRuning = false;
     public String EPCID1="", P_name1 = "", P_type1 = "",P_ID1="";
     private RetrofitInterface retrofitInterface;
-    private String BASE_URL = "http://192.168.0.101:3000";
+    private String BASE_URL = "https://rfidpoc.herokuapp.com/";
     private long mStrTime;
     public RegisterFragment() {
         // Required empty public constructor
@@ -78,13 +81,24 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
         Log.i(TAG, "UHFReadTagFragment.onActivityCreated");
         super.onActivityCreated(savedInstanceState);
         mContext = (MainActivity) getActivity();
-        init();
+        myReceiver =new ConnectivityReceiver();
+
+        IntentFilter intentFilter =new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        myReceiver = new ConnectivityReceiver();
+        mContext.registerReceiver(myReceiver,intentFilter);
+
     }
     private void setConnectStatusNotice() {
         System.out.println("66666666666666666666666666666"+mContext);
 
 //        if(mContext != null)
 //            mContext.setConnectStatusNotice(new ConnectStatus());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        init();
     }
 
     private void init() {
@@ -207,7 +221,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
         Spinner spinner = (Spinner) v.findViewById(R.id.spinner);
         spinner.setOnItemSelectedListener(this);
         List<String> categories = new ArrayList<String>();
-        categories.add("Unit");
+        categories.add("UNIT");
         categories.add("Kg");
         categories.add("mg");
         categories.add("Nos");
@@ -338,6 +352,8 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
 
     @Override
     public void onClick(View v) {
+
+
                    inventory();
     }
 }

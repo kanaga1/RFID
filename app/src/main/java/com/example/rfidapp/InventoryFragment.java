@@ -1,6 +1,8 @@
 package com.example.rfidapp;
 
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -46,8 +48,9 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 
-public class InventoryFragment extends Fragment implements View.OnClickListener {
-
+public class InventoryFragment extends Fragment implements View.OnClickListener, ConnectivityReceiver.ConnectionReceiverListener {
+    ConnectivityReceiver myReceiver;
+    ///connection
     private boolean loopFlag = false;
     private ListView LvTags;
     // private Button btInventory; "single"
@@ -87,12 +90,14 @@ public class InventoryFragment extends Fragment implements View.OnClickListener 
                         //停止成功
 //                        btClear.setEnabled(true);
                         btStop.setEnabled(false);
+                        btStop.setAlpha(0.3f);
                         InventoryLoop.setEnabled(true);
+                        InventoryLoop.setAlpha(1f);
                         // btInventory.setEnabled(true); "single"
                         btInventoryPerMinute.setEnabled(true);
                     } else {
                         //停止失败
-                        //Utils.playSound(2);
+                        Utils.playSound(2);
                         Toast.makeText(mContext, "Inventory Fail", Toast.LENGTH_SHORT).show();
                     }
                     break;
@@ -101,18 +106,20 @@ public class InventoryFragment extends Fragment implements View.OnClickListener 
                         //开始读取标签成功
 //                        btClear.setEnabled(false);
                         btStop.setEnabled(true);
+                        btStop.setAlpha(1f);
                         InventoryLoop.setEnabled(false);
+                        InventoryLoop.setAlpha(0.3f);
                         //  btInventory.setEnabled(false); "single"
                         btInventoryPerMinute.setEnabled(false);
                     } else {
                         //开始读取标签失败
-                        //Utils.playSound(2);
+                        Utils.playSound(2);
                     }
                     break;
                 case FLAG_UHFINFO:
                     UHFTAGInfo info = (UHFTAGInfo) msg.obj;
                     addEPCToList(info, "N/A");
-                    // Utils.playSound(1);
+
                     break;
             }
         }
@@ -128,17 +135,24 @@ public class InventoryFragment extends Fragment implements View.OnClickListener 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         System.out.println("1111111111111111111111111");
+
         return inflater.inflate(R.layout.fragment_inventory, container, false);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         System.out.println("2222222222222222222222222222");
-
+        Utils.initSound(getContext());
         Log.i(TAG, "UHFReadTagFragment.onActivityCreated");
         super.onActivityCreated(savedInstanceState);
         mContext = (MainActivity) getActivity();
-        init();
+        myReceiver =new ConnectivityReceiver();
+
+        IntentFilter intentFilter =new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        myReceiver = new ConnectivityReceiver();
+        mContext.registerReceiver(myReceiver,intentFilter);
+
+
     }
 
     @Override
@@ -232,6 +246,7 @@ public class InventoryFragment extends Fragment implements View.OnClickListener 
         InventoryLoop = (Button) mContext.findViewById(R.id.InventoryLoop);
         btStop = (Button) mContext.findViewById(R.id.btStop);
         btStop.setEnabled(false);
+        btStop.setAlpha(0.3f);
 //        btClear = (Button) mContext.findViewById(R.id.btClear);
         tv_count = (TextView) mContext.findViewById(R.id.tv_count);
 //        tv_total = (TextView) mContext.findViewById(R.id.tv_total);
@@ -263,7 +278,7 @@ public class InventoryFragment extends Fragment implements View.OnClickListener 
                 }
             }
         });
-        clearData();
+
     }
 
     @Override
@@ -272,14 +287,18 @@ public class InventoryFragment extends Fragment implements View.OnClickListener 
 
         super.onResume();
 
-        clearData();
+        init();
         if (mContext.uhf.getConnectStatus() == RFIDWithUHFBluetooth.StatusEnum.CONNECTED) {
 
             InventoryLoop.setEnabled(true);
+            InventoryLoop.setAlpha(1f);
+            btStop.setAlpha(0.3f);
         //    btInventory.setEnabled(true); "single"
             btInventoryPerMinute.setEnabled(true);
         } else {
             InventoryLoop.setEnabled(false);
+            InventoryLoop.setAlpha(0.3f);
+            btStop.setAlpha(0.3f);
           //  btInventory.setEnabled(false); "single"
             btInventoryPerMinute.setEnabled(false);
 
@@ -318,7 +337,6 @@ public class InventoryFragment extends Fragment implements View.OnClickListener 
                     }
                 }
                 else{
-
                     adapter.getFilter().filter(newText, new Filter.FilterListener() {
                         public void onFilterComplete(int count) {
                             Log.d("log", "result count:" + count);
@@ -429,6 +447,19 @@ public class InventoryFragment extends Fragment implements View.OnClickListener 
         new TagThread(isStop).start();
     }
 
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        if(isConnected) {
+
+
+
+        }
+        else
+        {
+            Toast.makeText(mContext,"No Internet Connection",Toast.LENGTH_SHORT);
+        }
+    }
+
     class TagThread extends Thread {
 
         boolean isStop = false;
@@ -509,6 +540,7 @@ public class InventoryFragment extends Fragment implements View.OnClickListener 
             // mContext.getAppContext().uhfQueue.offer(epc + "\t 1");
 
             if (index == -1) {
+
                 if(heroList.size()<1)
                 {
                     Toast.makeText(getContext(),"No items are available",Toast.LENGTH_SHORT);
@@ -521,7 +553,7 @@ public class InventoryFragment extends Fragment implements View.OnClickListener 
 
                         if(heroList.get(i).getEPCID().equals(uhftagInfo.getEPC()))
                         {
-
+                            Utils.playSound(1);
 //                        System.out.println("dddd"+ heroList.get(i).getP_name()+"uuu"+heroList.get(i).getP_type()+"hhh");
                             map1 = new HashMap<String, String>();
                             map1.put("tagUii", uhftagInfo.getEPC());
@@ -575,20 +607,16 @@ public class InventoryFragment extends Fragment implements View.OnClickListener 
     private String fileName;
 
 
-
-
-
-
-
-
-
     private void inventoryPerMinute() {
         System.out.println("llllllllllllllll");
         cancelInventoryTask();
         btInventoryPerMinute.setEnabled(false);
 //        btInventory.setEnabled(false);  "single"
         InventoryLoop.setEnabled(false);
+        InventoryLoop.setAlpha(0.3f);
         btStop.setEnabled(true);
+        btStop.setAlpha(1f);
+
         mContext.scaning = true;
         fileName = path + "battery_" + DateUtils.getCurrFormatDate(DateUtils.DATEFORMAT_FULL) + ".txt";
         mInventoryPerMinuteTask = new TimerTask() {
@@ -645,5 +673,10 @@ public class InventoryFragment extends Fragment implements View.OnClickListener 
                 }
             }
         }
+    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Utils.freeSound();
     }
 }

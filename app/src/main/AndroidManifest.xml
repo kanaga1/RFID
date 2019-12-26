@@ -6,13 +6,15 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission
         android:name="android.permission.BLUETOOTH_PRIVILEGED"
         tools:ignore="ProtectedPermissions" />
-
+    <uses-permission android:name="android.permission.CALL_PHONE" />
     <dist:module dist:instant="true" />
 
     <application
@@ -24,14 +26,15 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         android:vmSafeMode="true">
-        <activity android:name=".DeviceListActivity"></activity>
+        <activity android:name=".DeviceListActivity"
+            android:label="RFID Devices"
+            android:theme="@style/Theme.AppCompat.Dialog.Alert"
+            />
         <activity android:name=".recyclerview" />
-
         <activity android:name=".Register" />
         <activity android:name=".Login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

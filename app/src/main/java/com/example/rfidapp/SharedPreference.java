@@ -44,6 +44,7 @@ public class SharedPreference extends Application {
         SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
         editor.clear(); //clear all stored data
         editor.commit();
+        System.out.println("bbbbbbb");
     }
 
 //    public static void clearUserName1(DialogInterface.OnClickListener onClickListener) {

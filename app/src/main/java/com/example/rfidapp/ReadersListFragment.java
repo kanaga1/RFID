@@ -6,6 +6,8 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -117,8 +119,8 @@ public class ReadersListFragment extends Fragment implements View.OnClickListene
         mContext = (MainActivity) getActivity();
 
         if (mContext.uhf.getConnectStatus() == RFIDWithUHFBluetooth.StatusEnum.CONNECTED) {
+          //  btn_connect.setText("DISCONNECT");
 
-            btn_connect.setText("Disconnect");
             mIsActiveDisconnect = false;
             tvAddress.setText(SharedPreference.getDeviceName(getContext())+" - Connected");
             mReConnectCount = RECONNECT_NUM;
@@ -140,33 +142,54 @@ public class ReadersListFragment extends Fragment implements View.OnClickListene
         // Inflate the layout for this fragment
         System.out.println("11111111111111111");
          View v = inflater.inflate(R.layout.fragment_readers_list, container, false);
-
         tvAddress = (TextView) v.findViewById(R.id.tvAddress);
+         if(SharedPreference.getDeviceName(getContext())==null){
+             System.out.println("ioooooooooiiiiiiiiiioooooooo"+SharedPreference.getDeviceName(getContext()));
+             tvAddress.setText("No Device Found!!");
+         }
+         else{
+
+           //  tvAddress.setText(SharedPreference.getDeviceName(getContext())+" - Connected");
+         }
+
         btn_connect = (Button) v.findViewById(R.id.btn_connect);
+        btn_connect.setBackgroundColor(getResources().getColor(android.R.color.holo_red_dark));
+
         btn_search = (Button) v.findViewById(R.id.btn_search);
+        btn_search.setBackgroundColor(getResources().getColor(android.R.color.holo_green_dark));
+
         mTabHost =  v.findViewById(android.R.id.tabhost);
         btn_connect.setOnClickListener(this);
         btn_search.setOnClickListener(this);
+
+
+
          return v;
     }
 
 
     @Override
     public void onClick(View v) {
+
         switch (v.getId())
         {
             case R.id.btn_connect:
-                if (btn_connect.getText().equals(this.getString(R.string.Connect))) {
-                    scanBluetoothDevice();
-                } else {
+                if (mContext.uhf.getConnectStatus() == RFIDWithUHFBluetooth.StatusEnum.CONNECTED) {
                     mIsActiveDisconnect = true; // 主动断开为true
                     Toast.makeText(getContext(), "The Device has disconnected", Toast.LENGTH_SHORT).show();
-                    btn_connect.setText("Connect");
-                    tvAddress.setText(SharedPreference.getDeviceName(getContext())+" - not Connected");
-
-
+                    tvAddress.setText(SharedPreference.getDeviceName(getContext())+" - Disconnected");
+                    SharedPreference.cleardevicename(mContext);
+                    System.out.println("[[[[[[[[[[[[[[[["+SharedPreference.getDeviceName(mContext));
                     uhf.disconnect();
+
                 }
+                else
+                {
+                    Toast.makeText(getContext(), "There is no Device.. \nConnect any device", Toast.LENGTH_SHORT).show();
+
+                }
+
+
                 break;
             case R.id.btn_search:
                 if (scaning) {
@@ -178,6 +201,7 @@ public class ReadersListFragment extends Fragment implements View.OnClickListene
 
 
                 }
+
                 else
                 {
                     setConnectStatusNotice();
@@ -214,16 +238,13 @@ public class ReadersListFragment extends Fragment implements View.OnClickListene
 
                     if (statusEnum == RFIDWithUHFBluetooth.StatusEnum.CONNECTED ) {
                         SystemClock.sleep(500);
-                        btn_connect.setText(getActivity().getString(R.string.disConnect));
+//                        btn_connect.setText(getActivity().getString(R.string.disConnect));
                         remoteBTName = device.getName();
                         System.out.println("bbbbbbbbttttttname "+ remoteBTName);
                         remoteBTAdd = device.getAddress();
                         System.out.println("bbbbbbbbttttttname "+ remoteBTAdd);
                         tvAddress.setText(remoteBTName + "(" + remoteBTAdd + ")" + "-connected");
-                        if(SharedPreference.getDeviceName(mContext).length() != 0)
-                        {
-                            SharedPreference.cleardevicename(getContext());
-                        }
+
                         SharedPreference.setDeviceName(getContext(),remoteBTName + "(" + remoteBTAdd + ")" );
                         System.out.println("bbbbbbbbttttttname "+ tvAddress.getText());
                         if (shouldShowDisconnected()) {
@@ -234,7 +255,9 @@ public class ReadersListFragment extends Fragment implements View.OnClickListene
                         mIsActiveDisconnect = false;
                         mReConnectCount = RECONNECT_NUM;
                     } else if (statusEnum == RFIDWithUHFBluetooth.StatusEnum.DISCONNECTED) {
-                        btn_connect.setText(getContext().getString(R.string.Connect));
+//                        btn_connect.setText(getContext().getString(R.string.Connect));
+                        SharedPreference.cleardevicename(getContext());
+
                         if (device != null) {
                             remoteBTName = device.getName();
                             remoteBTAdd = device.getAddress();

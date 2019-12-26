@@ -26,7 +26,7 @@ public class Register extends AppCompatActivity {
     TextView login;
     private  String name="",email="",pass="";
     private RetrofitInterface retrofitInterface;
-    private String BASE_URL = "http://192.168.0.100:3000";
+    private String BASE_URL = "https://rfidpoc.herokuapp.com/";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
