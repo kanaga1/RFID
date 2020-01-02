@@ -8,62 +8,75 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <ScrollView
-            android:id="@+id/scrBarcode"
+
+        <EditText
+            android:id="@+id/editText1"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:textSize="70px"
-                android:paddingTop="20dp"
-                android:textFontWeight="1"
-                android:id="@+id/tvData" />
-        </ScrollView>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:text="@string/title_format"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            <Spinner
-                android:id="@+id/spingCodingFormat"
-                android:entries="@array/arr_barcode_coding_format"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp">
+            android:text="Button" />
 
-            <Button
-                android:id="@+id/btnScan"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textSize="50px"
-                android:textColor="@color/white"
-                android:background="#2E7D32"
-                android:text="@string/title_2Dscan"
-                />
-            <Button
-                android:id="@+id/btClear"
-                android:text="@string/psam_title_clear"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:background="#c62828"
-                android:textSize="50px"
-                android:textColor="@color/white"
-                android:layout_marginLeft="10dp"
-                android:layout_weight="1"
 
-               />
+        <!--        <ScrollView-->
+<!--            android:id="@+id/scrBarcode"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="0dp"-->
+<!--            android:layout_weight="1">-->
+<!--            <TextView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:textSize="70px"-->
+<!--                android:paddingTop="20dp"-->
+<!--                android:textFontWeight="1"-->
+<!--                android:id="@+id/tvData" />-->
+<!--        </ScrollView>-->
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content">-->
+<!--            <TextView-->
+<!--                android:text="@string/title_format"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content" />-->
+<!--            <Spinner-->
+<!--                android:id="@+id/spingCodingFormat"-->
+<!--                android:entries="@array/arr_barcode_coding_format"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_weight="1"-->
+<!--                android:layout_height="wrap_content" />-->
+<!--        </LinearLayout>-->
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_margin="10dp">-->
 
-        </LinearLayout>
+<!--            <Button-->
+<!--                android:id="@+id/btnScan"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:textSize="50px"-->
+<!--                android:textColor="@color/white"-->
+<!--                android:background="#2E7D32"-->
+<!--                android:text="@string/title_2Dscan"-->
+<!--                />-->
+<!--            <Button-->
+<!--                android:id="@+id/btClear"-->
+<!--                android:text="@string/psam_title_clear"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:background="#c62828"-->
+<!--                android:textSize="50px"-->
+<!--                android:textColor="@color/white"-->
+<!--                android:layout_marginLeft="10dp"-->
+<!--                android:layout_weight="1"-->
+
+<!--               />-->
+
+<!--        </LinearLayout>-->
 
     </LinearLayout>
 

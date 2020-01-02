@@ -1,6 +1,7 @@
 package com.example.rfidapp.Retrofit;
 
 import com.example.rfidapp.LoginResult;
+import com.example.rfidapp.Product;
 import com.example.rfidapp.User;
 
 import java.util.HashMap;
@@ -20,13 +21,16 @@ public interface RetrofitInterface {
     @GET("/Getrec")
     Call<List<User>> getUsers();
 
+    @GET("/Getsale")
+    Call<List<Product>> getSale();
+
 //    @POST("/signup")
 //    Call<Void> executeSignup (@Body HashMap<String, String> map);
 
+    @POST("/sale")
+    Call<Void> executesale(@Body HashMap<String, String> map);
+
     @POST("/regis")
     Call<Void> executeSignup (@Body HashMap<String, String> map);
-
-
-
 
 }

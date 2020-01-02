@@ -66,7 +66,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     boolean isRuning = false;
     public String EPCID1="", P_name1 = "", P_type1 = "",P_ID1="";
     private RetrofitInterface retrofitInterface;
-    private String BASE_URL = "https://rfidpoc.herokuapp.com/";
+    private String BASE_URL = "https://rfidpoc1.herokuapp.com/";
     private long mStrTime;
     public RegisterFragment() {
         // Required empty public constructor
@@ -197,6 +197,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+
 
 
     }
@@ -352,7 +353,6 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
 
     @Override
     public void onClick(View v) {
-
 
                    inventory();
     }

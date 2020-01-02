@@ -63,7 +63,7 @@ public class LocationingFragment extends Fragment {
     private String TAG = "DeviceAPI_UHFReadTag";
     Toast mToast;
 
-    private String BASE_URL = "https://rfidpoc.herokuapp.com/";
+    private String BASE_URL = "https://rfidpoc1.herokuapp.com/";
     private boolean loopFlag = false;
 
     // private Button btInventory; "single"

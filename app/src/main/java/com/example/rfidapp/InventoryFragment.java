@@ -318,8 +318,6 @@ public class InventoryFragment extends Fragment implements View.OnClickListener,
                     for(int i=0;i<tagList.size();i++)
                     {
 
-
-
                         map1 = new HashMap<String, String>();
                         map1.put("tagUii", tagList.get(i).get("tagUii"));
                         map1.put("tagData", tagList.get(i).get("tagData"));
@@ -450,9 +448,6 @@ public class InventoryFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onNetworkConnectionChanged(boolean isConnected) {
         if(isConnected) {
-
-
-
         }
         else
         {
